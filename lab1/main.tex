@@ -1,0 +1,77 @@
+\documentclass[letterpaper,12pt,titlepage,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+\usepackage{listings}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\usepackage{hyperref}
+\usepackage{geometry}
+
+\def\name{Kevin Turkington}
+\author{\name}
+\title{Lab 1}
+
+
+%% The following metadata will show up in the PDF properties
+\hypersetup{
+  colorlinks = true,
+  urlcolor = black,
+  pdfauthor = {\name},
+  pdfkeywords = {cs373},
+  pdfpagemode = UseNone
+}
+
+\begin{document}
+\maketitle
+\hrulefill
+
+\section{Binary Analysis}
+\subsection{evil.exe}
+During my analysis with McAfee's FileInsight program I found the Malware delete or create a collection of scheduled tasks to run every 30 minutes through out the day that run the file: \textit{c:/ntldrs/svchest.exe}. upon further research I found the \textit{svchest.exe} is a windows process that hosts multiple windows processes, which could mean the malware is attempting to stop firewalls or anti-virus scanners from running regularly. Additionally a couple different files are being stored within the ntldrs directory which may be dependencies for the malware to function or a seperate piece of malware altogether. Indicating the sample provided \textit{evil.exe} is probably a downloader, intended for the delivery and installation of the actual payload. upon further inspection of the malicious software I found a lot of vba specfic commands indicating the malware is written in visual basic. \par
+Files that are being stored in the boot directory:
+\begin{itemize}
+    \item ntldrs/Isinter.gif
+    \item ntldrs/system.yf
+    \item ntldrs/svchest.exe
+    \item ntldrs/funbots.bat
+\end{itemize}
+
+
+\subsection{tongji2.exe}
+During FileInsight of this file, I found a couple Delphi specfic commands and keywords in a string search. Which could mean the \textit{tongji2.exe} is the main payload of the malware. However the only thing that I could descipher from the keywords was that the program was attempting to spawn seperate threads. Which could mean machines are being for computational capabilitys as a whole.
+
+\section{Run time Analysis}
+After setting up the recommnded tools from the lab instructions I found during run time the malware immediately created a couple different GET/POST requests to an outside server specfically to the url \textit{timeless888.com}. Then \textit{evil.exe} proceeded to create a collection of files.
+while inspecting the windows task scheduler, it seemed to somewhat reflect what was examined in the binary file from \textit{evil.exe}, creating a 30 minute task running \textit{svchest.exe}. Once the exact hour came and the tasks were run the malware created a GET request to timeless888.com for a page called \textit{tong.htm}, however while conducting a system wide search for \textit{tong.htm} I could not find it. Leading to the conclusion that the website is stored in memory and will be served back to the victum in one way or another. 
+
+
+
+\section{research}
+After examining article from piazaa posted cas donoghue\cite{Analysis26:online}, I found out the malware was a backdoor Trojan with backdoor capabilities with the addition of serving up a fake webpage (\textit{tong.htm}) used for stealing social security numbers from Korean citizens. The payload of the virus was deployed in several stages starting from a simple visual basic script (\textit{evil.exe}), then downloading the dummy website, and finally installing a backdoor (\textit{tongji2.exe}).
+
+  
+% bibliography
+\nocite{*}%if nothing is referenced it will still show up in refs
+\bibliographystyle{plain}
+\bibliography{refs}
+%end bibliography
+
+\end{document}
