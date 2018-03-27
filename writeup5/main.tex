@@ -1,0 +1,74 @@
+\documentclass[letterpaper,12pt,titlepage,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+\usepackage{listings}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\usepackage{hyperref}
+\usepackage{geometry}
+
+\def\name{Kevin Turkington}
+\author{\name}
+\title{Writeup}
+
+
+%% The following metadata will show up in the PDF properties
+\hypersetup{
+  colorlinks = true,
+  urlcolor = black,
+  pdfauthor = {\name},
+  pdfkeywords = {cs373},
+  pdfpagemode = UseNone
+}
+
+\begin{document}
+\maketitle
+\hrulefill
+
+\section{Rootkits Overview}
+In Aditya Kapoor's lectures he describes rootKits in a general overview and the difficulties associated with removing post infection. Rootkits are typically installed at the driver level, the delivery of the payload is usually done in may different ways specifically
+\begin{itemize}
+    \item Spoofing driver signing checks
+    \item Modifying windows boot path (MBR)
+    \item General kernel exploits within the windows operating system
+    \item Stealing valid digital signatures
+\end{itemize}
+
+Each allows the payload to look authentic or be undetected by the user,as well as allow access into kernel level modules within the system. From there the rootkit can do a number of things to protect itself from being patched/removed and listen in on user actions. For example in most cases rootkits work similar to man in the middle attacks done on the internet to listen in on users traffic on a network. To begin the rootkit will target a specific process loaded into memory and running and replace its "Hooks" (function pointers) to other windows APIs within the Systems Service Descriptor Table (redirecting system calls through a middle man module and returning modified or recorded data back to the intended module.)  
+
+\section{Removing Rootkits}
+Once installed removing a rootkit can be extremely difficult for anti-virus engineers. Because rootkits have been known to spin up child threads to do one or multiple things such as:
+\begin{itemize}
+    \item File foraging
+    \item Memory foraging
+    \item Attack AntiViruses
+    \item Un-trusting or trusting different programs
+    \item Remove existing dependencies on files
+    \item Disassociated memory from a file
+    \item Protect malware source code
+\end{itemize}
+
+Rootkits when installed and has access to kernel level process and files they have the ability to show, hide and modify content within files or files themselves from the user. Which can aid in obfuscating rootkit source files from the user. Rootkits have also been known to prevent specific lists of programs from being opened by the user, the most obvious purpose for this is to prevent anti-virus engineers from opening tools then may need to investigate malware. Furthermore Rootkits can spin up watch dog threads, which can serve as a protection from patching Hooks to Windows kernel APIs within the system calls. Watch dog threads help replace patched drivers with their infected counterparts giving the illusion of fixing and creating an inert rootkit.
+
+\section{Bootkits Overview}
+While rootkits take up a more stealth approach to infection of a target, bootkits are vastly different. Bootkits take a goal is to edit the Master Boot Record (MBR) or Volume Boot Record (VBR) of a targets hard disk. Inorder to load rootkit malicious like functionality before the operating system is booted on the target machine. This allows the bootkit to run alongside windows without running the risk of being detected by antivirus softwares, because the malicous source code is run outside of the Operating Systems file structure. A great example of bootkit like functionality is \href{https://en.wikipedia.org/wiki/TrueCrypt}{TrueCrypt} a "pre-boot" hard drive encryption tool, it serves as an in between when booting an operating system keeping the system secure and only recoverable or bootable after proper authentication.
+
+\end{document}

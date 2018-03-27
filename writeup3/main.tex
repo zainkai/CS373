@@ -1,0 +1,97 @@
+\documentclass[letterpaper,12pt,titlepage,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+\usepackage{listings}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\usepackage{hyperref}
+\usepackage{geometry}
+
+\def\name{Kevin Turkington}
+\author{\name}
+\title{Writeup}
+
+
+%% The following metadata will show up in the PDF properties
+\hypersetup{
+  colorlinks = true,
+  urlcolor = black,
+  pdfauthor = {\name},
+  pdfkeywords = {cs373},
+  pdfpagemode = UseNone
+}
+
+\begin{document}
+\maketitle
+\hrulefill
+
+\section{Malware defense}
+%introduction
+During last weeks lectures we learned the appropriate tools to conduct both live and file analysis of malware on samples provided by Mr. Beek. This week with Mr. Schmugar we went over how to detect malware at the start before it infects your machine. This is done through yara signatures, these signatures work by scanning any binary or file of your choice for a set of strings or hexicode bytes followed by various rules such as concatenation, kleene star, and others, to match to specific types of files under the determined rule. Before getting into how to defened against malware an anti malware analyst needs to identify the 4 stages of malware itself:
+\begin{enumerate}
+    \item First Contact: the delivery of the malicious content itself.
+    \item Local Execution: Convining the target audience to execute the malware.
+    \item Establish a presence: blending into the background or implanting its services.
+    \item Malicous Activity: collecting or leveraging data against the target audience.
+\end{enumerate}
+
+\subsection{Yara Signitures}
+To prevent malware at the beginning during the first contact stages it is important for the analyst to create an accurate yet consise signiture that applies to mainly the target binary. This can be done through the use of the FileInsight program searching all strings contained in the binary and deconstructing what is and isnt important to the malware. This method can be helpful in thwarting attacks from polymorphic malware. When creating a rule for a target binary it is important to look for commonalities between serveral samples as well as using only a mix of ascii and wide characters since those are the only ones supported by yara signatures.
+\begin{lstlisting}[language=Python]
+# yara signiture example
+# sourced from github/Yara-Rules      APT_APT1.yar
+rule LIGHTDART_APT1
+{
+
+    meta:
+        author = "AlienVault Labs"
+        info = "CommentCrew-threat-apt1"
+        
+    strings:
+        $s1 = "ret.log" wide ascii
+        $s2 = "Microsoft Internet Explorer 6.0" wide ascii
+        $s3 = "szURL Fail" wide ascii
+        $s4 = "szURL Successfully" wide ascii
+        $s5 = "%s&sdate=%04ld-%02ld-%02ld" wide ascii
+
+    condition:
+        all of them
+}
+\end{lstlisting}
+
+\subsection{Cuckoo}
+Another program used in malware defense is cuckoo, it acts as a all in one similar to the previously used malware analyzation tools like fakenet, Flypaper, AntiSpy, and ProcMon. Except the virtual enviroment is managed by the software itself (creating its own collection of sacrifical goats). Cuckoo generates csv lists containing all the results of the malware specifically:
+\begin{itemize}
+    \item traces of win32 API calls
+    \item files being created/deleted/edited
+    \item memory dumps
+    \item network traces
+    \item screenshots of the desktop
+\end{itemize}
+
+
+% bibliography
+%\nocite{*}%if nothing is referenced it will still show up in refs
+%\bibliographystyle{plain}
+%\bibliography{refs}
+%end bibliography
+
+\end{document}

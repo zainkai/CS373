@@ -1,0 +1,101 @@
+\documentclass[letterpaper,12pt,titlepage,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+\usepackage{listings}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\usepackage{hyperref}
+\usepackage{geometry}
+
+\def\name{Kevin Turkington}
+\author{\name}
+\title{Writeup}
+
+
+%% The following metadata will show up in the PDF properties
+\hypersetup{
+  colorlinks = true,
+  urlcolor = black,
+  pdfauthor = {\name},
+  pdfkeywords = {cs373},
+  pdfpagemode = UseNone
+}
+
+\begin{document}
+\maketitle
+\hrulefill
+
+\section{General Exploitation}
+In Brad Antoiewiez's lectures he describes the basics to manipulating software as using vulnerabilities in a program unintended by the programmer. This can be through the use of finding bugs within software. As well as taking advantage of poor programming practices by the developer for example Mac OS bug of gaining root access into the "User & Groups" in system preferences using 'root' as a user name as seen in Robert Hackett's article Apple Macs Have Yet Another Password-Bypassing Bug. When looking for these vulrabilities intent can not always be nefarious, but can be turned into to specific companies 'Bug Bounty programs' for monetary rewards. For most of the labs within this weeks lectures we used the tool WinDbg to analyze and determine weather our programs exploits were completed correctly.
+
+\section{Stack overflow exploit}
+%introduction
+The stack overflow exploit is simply a case of stack smashing. Where a hacker loads the stack with a large set of repeated jibberish ending with an address in memory. Specifically the hacker is trying to overwrite any return address instructions with an address of their own pointing towards a separate payload with in stack memory. For example in Dhaval Kapils 'Buffer Overflow Exploit' blog post he provides the following compilable code for stack overflow exploitation:
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+void secretFunction()
+{
+    printf("Congratulations!\n");
+    printf("You have entered in the secret function!\n");
+}
+
+void echo()
+{
+    char buffer[20];
+    printf("Enter some text:\n");
+    scanf("%s", buffer);
+    printf("You entered: %s\n", buffer);    
+}
+
+int main()
+{
+    echo();
+    return 0;
+}
+\end{lstlisting}
+When the user is prompted to Enter some text the program can be exploited by providing a repeated set of hexadecimal values leading to the \texttt{secretFunction()} how ever this will differ machine to machine. For most modern computer this exploit is protected by utilizing a stack canary or stack cookie. Which is normally a randomly generated non-unicode or ascii character placed right before the return address pointer.
+
+The general step to using this exploit as shown in the slides are:
+\begin{enumerate}
+    \item Crash triage
+    \item Determine return address offset
+    \item position shell code
+    \item Find the address of our shell code
+\end{enumerate}
+
+\subsection{Free after use exploit}
+In a similar way to the stack overflow exploit where we overwrite the return address instruction, we are finding in heap memory where a class or data was recently freed and replacing the address of that freed data to a payload or shell code. So when the next time that page is reallocated and used it will contain a payload and will be promptly executed. A possible deterrent to this exploit could be immediately overwriting newly allocated heap memory or clearing it before use.
+
+\begin{enumerate}
+    \item Free the object
+    \item Replace the object with your object
+    \begin{enumerate}
+        \item Figure out the address
+        \item make allocations of the same size
+    \end{enumerate}
+    \item position shell code
+    \item Use object again
+\end{enumerate}
+
+
+\end{document}
